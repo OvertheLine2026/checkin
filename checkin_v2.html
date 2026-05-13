@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulldogs 2026 — OTL Check-In</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap');
+
+  :root {
+    --navy: #1a3a5c;
+    --navy-light: #2a5080;
+    --gold: #f5a623;
+    --gold-dark: #c8841a;
+    --green: #2d8a4e;
+    --green-bg: #e8f5ed;
+    --green-text: #1a5c32;
+    --warn: #b45309;
+    --warn-bg: #fef3c7;
+    --warn-text: #92400e;
+    --blue: #1d6fa8;
+    --blue-bg: #dbeafe;
+    --blue-text: #1e40af;
+    --red-bg: #fee2e2;
+    --red-text: #991b1b;
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --border: #d1dce8;
+    --text: #1a2536;
+    --muted: #64748b;
+    --light: #94a3b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+  }
+
+  .header {
+    background: var(--navy);
+    color: white;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  .header-left h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+  }
+
+  .header-left p { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+
+  .checkin-badge {
+    background: var(--gold);
+    color: var(--navy);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  .nav {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav button {
+    flex: 1;
+    min-width: 60px;
+    padding: 11px 4px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 3px solid transparent;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .nav button.active { color: var(--navy); border-bottom-color: var(--gold); }
+
+  .panel { display: none; padding: 12px; max-width: 600px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  .search-wrap {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+
+  .search-wrap input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .search-wrap input:focus { border-color: var(--navy); }
+
+  .refresh-btn {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.15s;
+  }
+
+  .refresh-btn:hover { background: var(--bg); }
+
+  .div-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 6px 0 4px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .div-block { margin-bottom: 16px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 0.2px;
+  }
+
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-in { background: var(--navy); color: white; }
+  .badge-ok { background: var(--green-bg); color: var(--green-text); }
+  .badge-warn { background: var(--warn-bg); color: var(--warn-text); }
+
+  .players {
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    margin-top: 10px;
+  }
+
+  .player-row {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 3px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .player-row::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  .warn-box {
+    background: var(--warn-bg);
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--warn-text);
+    font-weight: 500;
+  }
+
+  .action-row { display: flex; gap: 8px; margin-top: 8px; }
+
+  .btn {
+    flex: 1;
+    padding: 10px 8px;
+    border-radius: 9px;
+    border: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn-checkin {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 9px;
+    border: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .btn-checkin:active { transform: scale(0.98); }
+  .btn-ready { background: var(--navy); color: white; }
+  .btn-ready:hover { background: var(--navy-light); }
+  .btn-done { background: var(--green-bg); color: var(--green-text); cursor: default; }
+  .btn-pay { background: var(--warn-bg); color: var(--warn-text); border: 1px solid #fcd34d; }
+  .btn-resend { background: var(--blue-bg); color: var(--blue-text); border: 1px solid #93c5fd; }
+  .btn-sent { background: var(--green-bg); color: var(--green-text); border: 1px solid #86efac; cursor: default; }
+
+  /* Edit name */
+  .edit-name-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    align-items: center;
+  }
+
+  .edit-name-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+  }
+
+  .edit-name-input:focus { border-color: var(--navy); }
+
+  .edit-name-save {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--navy);
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .edit-name-cancel {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .edit-name-btn {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    font-family: 'Barlow', sans-serif;
+  }
+
+  .edit-name-btn:hover { color: var(--navy); }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .stat-num { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700; color: var(--navy); }
+  .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .parade-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+
+  .parade-num { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: var(--light); min-width: 20px; }
+  .parade-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--navy); flex: 1; letter-spacing: 0.2px; }
+
+  .bracket-round { margin-bottom: 12px; }
+
+  .round-lbl {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  .bracket-match { display: flex; gap: 6px; align-items: center; margin-bottom: 5px; }
+
+  .bracket-slot {
+    flex: 1;
+    padding: 8px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .bracket-slot.bye { color: var(--light); font-style: italic; }
+  .bracket-vs { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; color: var(--light); }
+
+  .admin-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+
+  .admin-badges { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+
+  .empty-msg { text-align: center; padding: 40px 20px; color: var(--light); font-size: 14px; }
+  .loading-msg { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .venmo-wrap {
+    text-align: center;
+    padding: 30px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-top: 8px;
+  }
+
+  .venmo-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: var(--navy); letter-spacing: 0.3px; }
+  .venmo-amount { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 700; color: var(--gold-dark); margin: 4px 0 16px; }
+
+  .venmo-btn {
+    display: inline-block;
+    padding: 14px 28px;
+    background: #3D95CE;
+    color: white;
+    border-radius: 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+  }
+
+  .venmo-note { margin-top: 14px; font-size: 12px; color: var(--muted); padding: 8px 12px; background: var(--bg); border-radius: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Bulldogs 2026 — OTL</h1>
+    <p>May 17 · Colina Middle School · Thousand Oaks</p>
+  </div>
+  <div class="checkin-badge" id="checkin-count">0 in</div>
+</div>
+
+<div class="nav">
+  <button class="active" onclick="showPanel('checkin',this)">Check-In</button>
+  <button onclick="showPanel('pay',this)">Pay</button>
+  <button onclick="showPanel('parade',this)">Parade</button>
+  <button onclick="showPanel('brackets',this)">Brackets</button>
+  <button onclick="showPanel('admin',this)">Admin</button>
+</div>
+
+<div id="checkin" class="panel active">
+  <div class="search-wrap">
+    <input id="search-input" type="search" placeholder="Search team, player, or parent name..." oninput="searchTeams()" />
+    <button class="refresh-btn" onclick="loadData()" title="Refresh">↻</button>
+  </div>
+  <div id="search-results"></div>
+  <div id="all-teams"><div class="loading-msg">Loading teams from roster...</div></div>
+</div>
+
+<div id="pay" class="panel">
+  <div class="venmo-wrap">
+    <div class="venmo-title">Entry Fee</div>
+    <div class="venmo-amount">$168</div>
+    <a class="venmo-btn" href="https://venmo.com/Bulldogs2026" target="_blank">Open Venmo — @Bulldogs2026</a>
+    <div class="venmo-note">📝 Include your <strong>team name</strong> in the payment note so we can match it!</div>
+  </div>
+</div>
+
+<div id="parade" class="panel">
+  <div class="section-title">Parade order — by division</div>
+  <div id="parade-list"><div class="empty-msg">No teams checked in yet</div></div>
+</div>
+
+<div id="brackets" class="panel">
+  <div class="section-title">Pool play brackets</div>
+  <div id="bracket-list"><div class="empty-msg">No teams checked in yet</div></div>
+</div>
+
+<div id="admin" class="panel">
+  <div class="stat-grid" id="stats">
+    <div class="stat"><div class="stat-num">—</div><div class="stat-lbl">Checked in</div></div>
+    <div class="stat"><div class="stat-num">—</div><div class="stat-lbl">Still to arrive</div></div>
+    <div class="stat"><div class="stat-num">—</div><div class="stat-lbl">Waivers done</div></div>
+    <div class="stat"><div class="stat-num">—</div><div class="stat-lbl">Fees paid</div></div>
+  </div>
+  <div class="section-title">All teams</div>
+  <div id="admin-list"><div class="loading-msg">Loading...</div></div>
+</div>
+
+<script>
+const SHEET_ID = '1bRgd_1q98swvofm2r1Sonmvam80UU_0rMbnxb0bcvMg';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&sheet=Sheet1';
+const DIVISIONS = ['Acorn 1','Acorn 2','Minors','Majors','Intermediate','Junior'];
+
+let TEAMS = [];
+let checkedIn = {};
+let resentWaiver = {};
+let editingName = {};
+let nameOverrides = {}; // stores renamed team names by id
+
+async function loadData() {
+  try {
+    const res = await fetch(SHEET_URL);
+    const text = await res.text();
+    const json = JSON.parse(text.substring(47).slice(0,-2));
+    const rows = json.table.rows;
+    TEAMS = rows
+      .filter(r => r.c && r.c[2] && r.c[2].v)
+      .map((r, idx) => {
+        const v = i => (r.c[i] && r.c[i].v != null) ? String(r.c[i].v).trim() : '';
+        const players = [v(6), v(10), v(14), v(18)].filter(p => p);
+        const guardians = [v(4), v(8), v(12), v(16)].filter(g => g);
+        return {
+          id: idx + 1,
+          name: v(2),
+          division: v(3),
+          players: players.length ? players : ['No players listed'],
+          guardians: guardians,
+          waiver: v(0) === '✅',
+          fee: v(1) === '✅',
+          envelopeId: v(20)
+        };
+      });
+    refreshView();
+    renderAdmin();
+    updateCount();
+  } catch(e) {
+    document.getElementById('all-teams').innerHTML = '<div class="empty-msg">⚠️ Could not load data. Check internet connection and try refreshing.</div>';
+  }
+}
+
+// Get display name — use override if set, otherwise original
+function getDisplayName(t) {
+  return nameOverrides[t.id] || t.name;
+}
+
+function startEditName(id) {
+  editingName[id] = true;
+  refreshView();
+}
+
+function cancelEditName(id) {
+  delete editingName[id];
+  refreshView();
+}
+
+function saveNameEdit(id) {
+  const input = document.getElementById('name-input-' + id);
+  if (!input) return;
+  const newName = input.value.trim();
+  if (newName) {
+    nameOverrides[id] = newName;
+  }
+  delete editingName[id];
+  refreshView();
+  if (Object.keys(checkedIn).length) {
+    renderParade();
+    renderBrackets();
+  }
+}
+
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id === 'parade') renderParade();
+  if(id === 'brackets') renderBrackets();
+  if(id === 'admin') renderAdmin();
+}
+
+function searchTeams() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  const results = document.getElementById('search-results');
+  const all = document.getElementById('all-teams');
+  if(!q) { results.innerHTML = ''; renderAllTeams(); return; }
+  all.innerHTML = '';
+  const matches = TEAMS.filter(t =>
+    getDisplayName(t).toLowerCase().includes(q) ||
+    t.name.toLowerCase().includes(q) ||
+    t.players.some(p => p.toLowerCase().includes(q)) ||
+    (t.guardians && t.guardians.some(g => g.toLowerCase().includes(q)))
+  );
+  results.innerHTML = matches.length
+    ? matches.map(t => teamCard(t)).join('')
+    : '<div class="empty-msg">No team found — check spelling or ask coordinator</div>';
+}
+
+function renderAllTeams() {
+  const el = document.getElementById('all-teams');
+  if(!TEAMS.length) { el.innerHTML = '<div class="loading-msg">Loading teams...</div>'; return; }
+  const html = DIVISIONS.map(div => {
+    const teams = TEAMS.filter(t => t.division === div);
+    if(!teams.length) return '';
+    return '<div class="div-block"><div class="div-label">' + div + '</div>' + teams.map(t => teamCard(t)).join('') + '</div>';
+  }).join('');
+  el.innerHTML = html || '<div class="empty-msg">No teams loaded yet</div>';
+}
+
+function teamCard(t) {
+  const isIn = checkedIn[t.id];
+  const ready = t.waiver && t.fee;
+  const sent = resentWaiver[t.id];
+  const displayName = getDisplayName(t);
+  const isTBD = displayName.toLowerCase() === 'tbd' || displayName.toLowerCase().includes('tbd');
+  const isEditing = editingName[t.id];
+
+  const players = t.players.map(p => '<div class="player-row">' + p + '</div>').join('');
+  const playersHtml = '<div class="players">' + players + '</div>';
+
+  // Name display with edit option
+  let nameHtml = '';
+  if (isEditing) {
+    nameHtml = '<div class="edit-name-row">' +
+      '<input class="edit-name-input" id="name-input-' + t.id + '" value="' + displayName + '" placeholder="Enter team name" />' +
+      '<button class="edit-name-save" onclick="saveNameEdit(' + t.id + ')">Save</button>' +
+      '<button class="edit-name-cancel" onclick="cancelEditName(' + t.id + ')">✕</button>' +
+      '</div>';
+  } else {
+    nameHtml = '<button class="edit-name-btn" onclick="startEditName(' + t.id + ')">' +
+      (isTBD ? '✏️ Set team name' : '✏️ Edit name') + '</button>';
+  }
+
+  let action = '';
+  if(isIn) {
+    action = '<button class="btn-checkin btn-done">✅ Checked in</button>';
+  } else if(ready) {
+    action = '<button class="btn-checkin btn-ready" onclick="checkIn(' + t.id + ')">Check in team →</button>';
+  } else {
+    const issues = [];
+    if(!t.waiver) issues.push('Waiver incomplete');
+    if(!t.fee) issues.push('Fee unpaid');
+    const payBtn = !t.fee ? '<button class="btn btn-pay" onclick="document.querySelectorAll(\'.nav button\')[1].click()">Pay now →</button>' : '';
+    const resendBtn = !t.waiver ? '<button class="btn ' + (sent ? 'btn-sent' : 'btn-resend') + '" onclick="resendWaiver(' + t.id + ')">' + (sent ? '✅ Resent' : 'Resend waiver') + '</button>' : '';
+    action = '<div class="warn-box">⚠️ ' + issues.join(' · ') + '</div><div class="action-row">' + payBtn + resendBtn + '</div>';
+  }
+
+  return '<div class="card">' +
+    '<div class="card-header">' +
+    '<div>' +
+    '<div class="card-title">' + displayName + (isTBD && !isEditing ? ' <span style="font-size:12px;color:var(--warn);font-weight:400">— name needed</span>' : '') + '</div>' +
+    '<div class="card-sub">' + t.division + ' · ' + t.players.length + ' player' + (t.players.length !== 1 ? 's' : '') + '</div>' +
+    '</div>' +
+    (isIn ? '<span class="badge badge-in">In</span>' : '') +
+    '</div>' +
+    nameHtml +
+    playersHtml +
+    action +
+    '</div>';
+}
+
+function checkIn(id) {
+  checkedIn[id] = true;
+  updateCount();
+  refreshView();
+}
+
+function resendWaiver(id) {
+  const t = TEAMS.find(x => x.id === id);
+  if(!t || !t.envelopeId) { alert('No envelope ID found for this team.'); return; }
+  resentWaiver[id] = true;
+  refreshView();
+  alert('✅ Waiver reminder sent to all unsigned guardians!');
+}
+
+function updateCount() {
+  const n = Object.keys(checkedIn).length;
+  document.getElementById('checkin-count').textContent = n + ' / ' + TEAMS.length + ' in';
+}
+
+function refreshView() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  if(q) searchTeams(); else renderAllTeams();
+}
+
+function generateMatchups(teams) {
+  const n = teams.length;
+  if(n < 2) return [];
+  if(n === 2) return [[{a:teams[0],b:teams[1]}]];
+  if(n === 3) return [
+    [{a:teams[0],b:teams[1]},{a:teams[2],b:null}],
+    [{a:teams[1],b:teams[2]},{a:teams[0],b:null}],
+    [{a:teams[0],b:teams[2]},{a:teams[1],b:null}]
+  ];
+  if(n === 4) return [
+    [{a:teams[0],b:teams[1]},{a:teams[2],b:teams[3]}],
+    [{a:teams[0],b:teams[2]},{a:teams[1],b:teams[3]}],
+    [{a:teams[0],b:teams[3]},{a:teams[1],b:teams[2]}]
+  ];
+  if(n === 5) return [
+    [{a:teams[0],b:teams[1]},{a:teams[2],b:teams[3]}],
+    [{a:teams[4],b:teams[0]},{a:teams[1],b:teams[2]}],
+    [{a:teams[3],b:teams[4]},{a:teams[0],b:teams[2]}],
+    [{a:teams[1],b:teams[3]},{a:teams[4],b:teams[2]}],
+    [{a:teams[0],b:teams[3]},{a:teams[1],b:teams[4]}]
+  ];
+  return [
+    [{a:teams[0],b:teams[1]},{a:teams[2],b:teams[5]},{a:teams[3],b:teams[4]}],
+    [{a:teams[5],b:teams[0]},{a:teams[1],b:teams[4]},{a:teams[2],b:teams[3]}],
+    [{a:teams[3],b:teams[5]},{a:teams[4],b:teams[0]},{a:teams[1],b:teams[2]}],
+    [{a:teams[5],b:teams[1]},{a:teams[0],b:teams[3]},{a:teams[4],b:teams[2]}],
+    [{a:teams[2],b:teams[5]},{a:teams[0],b:teams[4]},{a:teams[1],b:teams[3]}]
+  ];
+}
+
+function renderParade() {
+  const el = document.getElementById('parade-list');
+  const ct = TEAMS.filter(t => checkedIn[t.id]);
+  if(!ct.length) { el.innerHTML = '<div class="empty-msg">No teams checked in yet</div>'; return; }
+  el.innerHTML = DIVISIONS.map(div => {
+    const teams = ct.filter(t => t.division === div);
+    if(!teams.length) return '';
+    return '<div class="div-block"><div class="div-label">' + div + ' — ' + teams.length + ' team' + (teams.length !== 1 ? 's' : '') + '</div>' +
+      teams.map((t,i) => '<div class="parade-row"><span class="parade-num">' + (i+1) + '</span><span class="parade-name">' + getDisplayName(t) + '</span></div>').join('') + '</div>';
+  }).join('');
+}
+
+function renderBrackets() {
+  const el = document.getElementById('bracket-list');
+  const ct = TEAMS.filter(t => checkedIn[t.id]);
+  if(!ct.length) { el.innerHTML = '<div class="empty-msg">No teams checked in yet</div>'; return; }
+  el.innerHTML = DIVISIONS.map(div => {
+    const teams = ct.filter(t => t.division === div);
+    if(!teams.length) return '';
+    const rounds = generateMatchups(teams);
+    const roundsHtml = rounds.map((round, ri) =>
+      '<div class="bracket-round"><div class="round-lbl">Round ' + (ri+1) + '</div>' +
+      round.map(m => '<div class="bracket-match"><div class="bracket-slot' + (m.b ? '' : ' bye') + '">' + (m.a ? getDisplayName(m.a) : 'BYE') + '</div><div class="bracket-vs">vs</div><div class="bracket-slot' + (m.b ? '' : ' bye') + '">' + (m.b ? getDisplayName(m.b) : 'BYE') + '</div></div>').join('') + '</div>'
+    ).join('');
+    return '<div class="div-block"><div class="div-label">' + div + ' — ' + teams.length + ' team' + (teams.length !== 1 ? 's' : '') + '</div>' + roundsHtml + '</div>';
+  }).join('');
+}
+
+function renderAdmin() {
+  if(!TEAMS.length) return;
+  const checked = Object.keys(checkedIn).length;
+  const total = TEAMS.length;
+  const wDone = TEAMS.filter(t => t.waiver).length;
+  const fDone = TEAMS.filter(t => t.fee).length;
+  document.getElementById('stats').innerHTML =
+    '<div class="stat"><div class="stat-num">' + checked + '/' + total + '</div><div class="stat-lbl">Checked in</div></div>' +
+    '<div class="stat"><div class="stat-num">' + (total - checked) + '</div><div class="stat-lbl">Still to arrive</div></div>' +
+    '<div class="stat"><div class="stat-num">' + wDone + '/' + total + '</div><div class="stat-lbl">Waivers done</div></div>' +
+    '<div class="stat"><div class="stat-num">' + fDone + '/' + total + '</div><div class="stat-lbl">Fees paid</div></div>';
+  document.getElementById('admin-list').innerHTML = TEAMS.map(t =>
+    '<div class="admin-row"><div><div style="font-size:14px;font-weight:600;color:var(--navy)">' + getDisplayName(t) + (t.name !== getDisplayName(t) ? ' <span style="font-size:11px;color:var(--muted)">(was: ' + t.name + ')</span>' : '') + '</div><div style="font-size:11px;color:var(--muted)">' + t.division + '</div></div>' +
+    '<div class="admin-badges">' +
+    (checkedIn[t.id] ? '<span class="badge badge-in">In</span>' : '') +
+    '<span class="badge ' + (t.waiver ? 'badge-ok' : 'badge-warn') + '">' + (t.waiver ? 'Waiver ✅' : 'No waiver') + '</span>' +
+    '<span class="badge ' + (t.fee ? 'badge-ok' : 'badge-warn') + '">' + (t.fee ? 'Paid ✅' : 'Unpaid') + '</span>' +
+    '</div></div>'
+  ).join('');
+}
+
+loadData();
+</script>
+</body>
+</html>
